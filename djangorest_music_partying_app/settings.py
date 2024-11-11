@@ -27,8 +27,8 @@ SECRET_KEY = 'django-insecure-lc6_wd))2*&5=5uu*4-6-l_ny$)#gz%s9z2^h$e6#b=%v6mh1c
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['scheff-retro-live-house-app.onrender.com', 'localhost', '127.0.0.1']
+PORT = os.getenv('PORT', '8080')
 
 # Application definition
 
