@@ -9,7 +9,6 @@ import PauseRounded from "@mui/icons-material/PauseRounded";
 import PlayArrowRounded from "@mui/icons-material/PlayArrowRounded";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
-
 const Widget = styled("div")(({ theme }) => ({
   padding: 16,
   borderRadius: 16,
@@ -65,32 +64,13 @@ export default function MusicPlayerSlider({
     setPosition(time);
   }, [time]);
 
-  const handlePlayPause = () => {
+  const handlePlayPause = async () => {
     if (isPlaying) {
-      pauseSong();
-      setIsPlaying(false);
+      const success = await pauseSong();
+      if (success) setIsPlaying(false);
     } else {
-      playSong();
-      setIsPlaying(true);
-    }
-  };
-
-  const pauseSong = async () => {
-    const requestOptions = {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-    };
-    try {
-      const response = await fetch("/spotify_api/pause", requestOptions);
-      if (response.ok) {
-        const jsonResponse = await response.json();
-        console.log("Pause response:", jsonResponse); // Log the response
-        setIsPlaying(false); // Update state only if the request was successful
-      } else {
-        console.error("Error pausing song:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error pausing song:", error);
+      const success = await playSong();
+      if (success) setIsPlaying(true);
     }
   };
 
@@ -102,15 +82,30 @@ export default function MusicPlayerSlider({
     try {
       const response = await fetch("/spotify_api/play", requestOptions);
       if (response.ok) {
-        const jsonResponse = await response.json();
-        console.log("Play response:", jsonResponse); // Log the response
-        setIsPlaying(true); // Update state only if the request was successful
-      } else {
-        console.error("Error playing song:", response.statusText);
+        console.log("Play response:", await response.json());
+        return true; // Play request successful
       }
     } catch (error) {
       console.error("Error playing song:", error);
     }
+    return false; // Play request failed
+  };
+
+  const pauseSong = async () => {
+    const requestOptions = {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+    };
+    try {
+      const response = await fetch("/spotify_api/pause", requestOptions);
+      if (response.ok) {
+        console.log("Pause response:", await response.json());
+        return true; // Pause request successful
+      }
+    } catch (error) {
+      console.error("Error pausing song:", error);
+    }
+    return false; // Pause request failed
   };
 
   const skipSong = () => {

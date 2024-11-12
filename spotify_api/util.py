@@ -75,30 +75,39 @@ def execute_spotify_api_request(session_id, endpoint, post_=False, put_=False):
     tokens = get_user_tokens(session_id)
     if tokens is None or tokens.access_token is None:
         raise ValueError("Access token is missing or invalid.")
-    
+
+    # Refresh token if expired
+    if tokens.expires_in <= timezone.now():
+        refresh_spotify_token(session_id)
+        tokens = get_user_tokens(session_id)  # Re-fetch after refreshing
+
     headers = {'Content-Type': 'application/json',
                'Authorization': "Bearer " + tokens.access_token}
 
+    # Make request
     if post_:
         response = post(BASE_URL + endpoint, headers=headers, json={})
-        return response.json()
-    if put_:
+    elif put_:
         response = put(BASE_URL + endpoint, headers=headers, json={})
-        return response.json()
-
-    response = get(BASE_URL + endpoint, headers=headers)
+    else:
+        response = get(BASE_URL + endpoint, headers=headers)
+    
     try:
         return response.json()
-    except:
-        return {'Error': 'Issue with request'}
-    
+    except Exception as e:
+        return {'Error': 'Issue with request', 'detail': str(e)}
 
 def play_song(session_id):
-    return execute_spotify_api_request(session_id, "player/play", put_=True)
-
+    response = execute_spotify_api_request(session_id, "player/play", put_=True)
+    print("Play song response:", response)
+    return response
 
 def pause_song(session_id):
-    return execute_spotify_api_request(session_id, "player/pause", put_=True)
+    response = execute_spotify_api_request(session_id, "player/pause", put_=True)
+    print("Pause song response:", response)
+    return response
 
 def skip_song(session_id):
-    return execute_spotify_api_request(session_id, "player/next", post_=True)
+    response = execute_spotify_api_request(session_id, "player/next", post_=True)
+    print("Pause song response:", response)
+    return response
