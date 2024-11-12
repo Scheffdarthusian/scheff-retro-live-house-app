@@ -137,14 +137,26 @@ class SkipSong(APIView):
     def post(self, request, format=None):
         room_code = self.request.session.get('room_code')
         room = Room.objects.filter(code=room_code)[0]
-        votes = Vote.objects.filter(room=room, song_id = room.current_song)
+        votes = Vote.objects.filter(room=room, song_id=room.current_song)
         votes_needed = room.votes_to_skip
-        
-        if self.request.session.session_key == room.host or len(votes) + 1 >= votes_needed:
+
+        # Get the session key of the user
+        user_session_key = self.request.session.session_key
+
+        # Check if the user has already voted for this song
+        existing_vote = votes.filter(user=user_session_key).exists()
+
+        if existing_vote:
+            # If the user has already voted, return a response without adding a new vote
+            return Response({"detail": "You have already voted to skip this song."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Host or enough votes to skip the song
+        if user_session_key == room.host or len(votes) + 1 >= votes_needed:
             votes.delete()
             skip_song(room.host)
         else:
-            vote = Vote(user=self.request.session.session_key, room=room, song_id=room.current_song)
+            # Save the user's vote if it's their first vote for the song
+            vote = Vote(user=user_session_key, room=room, song_id=room.current_song)
             vote.save()
-        
-        return Response({}, status=status.HTTP_204_NO_CONTENT) 
+
+        return Response({}, status=status.HTTP_204_NO_CONTENT)
