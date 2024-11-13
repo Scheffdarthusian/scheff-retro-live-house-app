@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 import dj_database_url
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -85,7 +86,7 @@ WSGI_APPLICATION = 'djangorest_music_partying_app.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgresql://scheff_online_livehouse_database_user:XKHNiw12TGyze1v8VrJ7rzb87W6ONiJx@dpg-csomi5a3esus73c8u4eg-a.singapore-postgres.render.com/scheff_online_livehouse_database',
+        default=config('DATABASE_URL'),
         conn_max_age=600
     )
 }
