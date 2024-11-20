@@ -9,6 +9,7 @@ import {
   Routes,
 } from "react-router-dom";
 import RoomJoinPage from "./RoomJoinPage";
+import TitleTypewriter from "./TitleTypewriter";
 import { Grid2, Button, ButtonGroup, Typography } from "@mui/material";
 
 const HomePage = () => {
@@ -37,9 +38,7 @@ const HomePage = () => {
             justifyContent="center"
             alignItems="center"
           >
-            <Typography variant="h1" component="h1" color="white">
-              Retro Live House
-            </Typography>
+            <TitleTypewriter />
           </Grid2>
           <Grid2
             size={12}
