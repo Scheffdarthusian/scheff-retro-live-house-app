@@ -1,4 +1,5 @@
 Live Site: https://scheff-retro-live-house-app.onrender.com/
+長い時間で使われていない場合は、サーバーの再起動が必要ですので、少々お待ちください。
 
 プロジェクト概要:
 
