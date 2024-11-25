@@ -45,46 +45,46 @@ const Room = ({ leaveRoomCallBack }) => {
     return () => clearInterval(interval); // Cleanup on component unmount
   }, []); // Empty dependency array ensures effect runs once on mount
 
-  const authenticateSpotify = () => {
-    fetch("/spotify_api/is-authenticated")
-      .then((response) => response.json())
-      .then((data) => {
-        setSpotifyAuthenticated(data.status);
-        console.log(data.status);
-        if (!data.status) {
-          fetch("/spotify_api/get-auth-url")
-            .then((response) => response.json())
-            .then((data) => {
-              window.location.replace(data.url);
-            });
-        }
-      });
+  const authenticateSpotify = async () => {
+    try {
+      const response = await fetch("/spotify_api/is-authenticated");
+      const data = await response.json();
+      setSpotifyAuthenticated(data.status);
+
+      if (!data.status) {
+        const authResponse = await fetch("/spotify_api/get-auth-url");
+        const authData = await authResponse.json();
+        window.location.replace(authData.url);
+      }
+    } catch (error) {
+      console.error("Error authenticating Spotify:", error);
+    }
   };
 
-  const getCurrentSong = () => {
-    fetch("/spotify_api/current-song")
-      .then((response) => {
-        if (!response.ok) {
-          return {};
-        } else {
-          return response.json();
-        }
-      })
-      .then((data) => setSong(data))
-      .catch((error) => {
-        console.error("Error fetching song:", error);
-      });
+  const getCurrentSong = async () => {
+    try {
+      const response = await fetch("/spotify_api/current-song");
+      if (response.ok) {
+        const data = await response.json();
+        setSong(data);
+      }
+    } catch (error) {
+      console.error("Error fetching song:", error);
+    }
   };
 
-  const leaveButtonPressed = () => {
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-    };
-    fetch("/api/leave-room", requestOptions).then((_response) => {
+  const leaveButtonPressed = async () => {
+    try {
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      };
+      await fetch("/api/leave-room", requestOptions);
       leaveRoomCallBack();
       navigate("/");
-    });
+    } catch (error) {
+      console.error("Error leaving room:", error);
+    }
   };
 
   const renderSettings = () => {

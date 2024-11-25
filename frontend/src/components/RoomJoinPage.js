@@ -11,25 +11,24 @@ const RoomJoinPage = () => {
     setRoomCode(e.target.value);
   };
 
-  const roomButtonPressed = () => {
+  const roomButtonPressed = async () => {
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        code: roomCode,
-      }),
+      body: JSON.stringify({ code: roomCode }),
     };
-    fetch("/api/join-room", requestOptions)
-      .then((response) => {
-        if (response.ok) {
-          navigate(`/room/${roomCode}`);
-        } else {
-          setError("Room not found");
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+
+    try {
+      const response = await fetch("/api/join-room", requestOptions);
+      if (response.ok) {
+        navigate(`/room/${roomCode}`);
+      } else {
+        setError("Room not found");
+      }
+    } catch (error) {
+      console.error("Error joining room:", error);
+      setError("An error occurred. Please try again.");
+    }
   };
 
   return (

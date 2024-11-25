@@ -35,7 +35,7 @@ const CreateRoomPage = ({
     setGuestCanPauseState(e.target.value === "true");
   };
 
-  const handleRoomButtonPressed = () => {
+  const handleRoomButtonPressed = async () => {
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -44,12 +44,16 @@ const CreateRoomPage = ({
         guest_can_pause: guestCanPauseState,
       }),
     };
-    fetch("/api/create-room", requestOptions)
-      .then((response) => response.json())
-      .then((data) => navigate("/room/" + data.code));
+    try {
+      const response = await fetch("/api/create-room", requestOptions);
+      const data = await response.json();
+      navigate("/room/" + data.code);
+    } catch (error) {
+      console.error("Error creating room:", error);
+    }
   };
 
-  const handleUpdateButtonPressed = () => {
+  const handleUpdateButtonPressed = async () => {
     const requestOptions = {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -59,14 +63,18 @@ const CreateRoomPage = ({
         code: roomCode,
       }),
     };
-    fetch("/api/update-room", requestOptions).then((response) => {
+    try {
+      const response = await fetch("/api/update-room", requestOptions);
       if (response.ok) {
         setSuccessMsg("Room updated successfully!");
       } else {
         setErrorMsg("Failed to update room");
       }
       updateCallback();
-    });
+    } catch (error) {
+      console.error("Error updating room:", error);
+      setErrorMsg("An error occurred while updating the room");
+    }
   };
 
   const renderCreateButton = () => (
